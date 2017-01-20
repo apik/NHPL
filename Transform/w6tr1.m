@@ -1,5 +1,3 @@
-(* Created by Wolfram Mathematica 9.0 : www.wolfram.com *)
-transform1[6]=
 {H[-1, -1, -1, -1, -1, 0, x] -> -Pi^6/945 - H[-1, -1, -1, -1, -1, 0, r1] - 
    H[-1, -1, -1, -1, 0, 0, r1] - H[-1, -1, -1, 0, 0, 0, r1] - 
    H[-1, -1, 0, 0, 0, 0, r1] - H[-1, 0, 0, 0, 0, 0, r1] + 
@@ -7814,4 +7812,4 @@ transform1[6]=
      PolyLog[5, 1 - r1] + Zeta[5]) - Log[r1]*((Log[1 - r1]^4*Log[r1])/24 + 
      (Log[1 - r1]^3*PolyLog[2, 1 - r1])/6 - 
      (Log[1 - r1]^2*PolyLog[3, 1 - r1])/2 + Log[1 - r1]*PolyLog[4, 1 - r1] - 
-     PolyLog[5, 1 - r1] + Zeta[5])};
+     PolyLog[5, 1 - r1] + Zeta[5])}

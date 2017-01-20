@@ -1,5 +1,3 @@
-(* Regularization for basis functions of weight 5 *)
-reg[5]=
 {H[-1, -1, -1, -1, 0, x_] -> -H[-2, -1, -1, -1, x] - H[-1, -2, -1, -1, x] -
    H[-1, -1, -2, -1, x] - H[-1, -1, -1, -2, x] + (Log[x]*Log[1 + x]^4)/24,
  H[-1, -1, -1, 0, 0, x_] -> H[-3, -1, -1, x] + H[-2, -2, -1, x] +
@@ -83,4 +81,4 @@ reg[5]=
    (Log[1 - x]^3*Log[x]*Log[(1 + x)/2])/6 -
    (Log[1 - x]^2*Log[x]*PolyLog[2, (1 - x)/2])/2 +
    Log[1 - x]*Log[x]*PolyLog[3, (1 - x)/2] + Log[x]*PolyLog[4, 1/2] -
-   Log[x]*PolyLog[4, (1 - x)/2]};
+   Log[x]*PolyLog[4, (1 - x)/2]}

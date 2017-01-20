@@ -1,5 +1,3 @@
-(* Created by Wolfram Mathematica 9.0 : www.wolfram.com *)
-red[4]=
 {H[1, 1, 1, 1, x_] -> Log[1 - x]^4/24, H[1, 1, 1, 0, x_] -> 
   -Pi^4/90 + (Log[1 - x]^3*Log[x])/6 + (Log[1 - x]^2*PolyLog[2, 1 - x])/2 + 
    (Log[1 - x]^2*(-(Log[1 - x]*Log[x]) - PolyLog[2, x]))/6 - 
@@ -403,4 +401,4 @@ red[4]=
  H[-1, -1, -2, x_] -> -3*H[-1, -1, -1, 0, x] + 
    (Log[1 + x]*(Log[1 + x]*(Pi^2 + 3*(-Log[-x] + Log[x])*Log[1 + x]) - 
       6*PolyLog[3, 1 + x] + 6*Zeta[3]))/6, H[-1, -1, -1, -1, x_] -> 
-  Log[1 + x]^4/24};
+  Log[1 + x]^4/24}

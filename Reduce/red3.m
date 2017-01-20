@@ -1,5 +1,3 @@
-(* Created by Wolfram Mathematica 9.0 : www.wolfram.com *)
-red[3]=
 {H[1, 1, 1, x_] -> -Log[1 - x]^3/6, H[1, 1, 0, x_] -> 
   (Log[1 - x]^2*Log[x])/2 + Log[1 - x]*PolyLog[2, 1 - x] - 
    (Log[1 - x]*(-(Log[1 - x]*Log[x]) - PolyLog[2, x]))/2 + 
@@ -82,4 +80,4 @@ red[3]=
      24*PolyLog[3, (1 + x)/2] + 21*Zeta[3])/12, 
  H[-1, -2, x_] -> Log[1 + x]*(Log[x]*Log[1 + x] + PolyLog[2, -x]) + 
    (-(Log[1 + x]*(Pi^2 + 3*(-Log[-x] + Log[x])*Log[1 + x])) + 
-     6*PolyLog[3, 1 + x] - 6*Zeta[3])/3, H[-1, -1, -1, x_] -> Log[1 + x]^3/6};
+     6*PolyLog[3, 1 + x] - 6*Zeta[3])/3, H[-1, -1, -1, x_] -> Log[1 + x]^3/6}

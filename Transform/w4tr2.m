@@ -1,5 +1,3 @@
-(* Created by Wolfram Mathematica 9.0 : www.wolfram.com *)
-transform2[4]=
 {H[-1, -1, -1, 0, x] -> -Pi^4/90 + H[-1, -1, -1, 1, r2] - 
    (Pi^2*Log[2]^2)/12 + Log[2]^4/24 + (Pi^2*Log[2]*Log[1 + r2])/12 - 
    (Pi^2*Log[1 + r2]^2)/24 + Log[1 + r2]^4/24 + PolyLog[4, 1/2] + 
@@ -368,4 +366,4 @@ transform2[4]=
       2*Log[1 + r2]*(Pi^2 - 6*Log[2]^2 + Log[64]*Log[1 + r2]) + 
       24*Log[r2]*PolyLog[2, (1 + r2)/2] - 24*PolyLog[3, r2] - 
       24*PolyLog[3, r2/(1 + r2)] + 24*PolyLog[3, (2*r2)/(1 + r2)] - 
-      24*PolyLog[3, (1 + r2)/2] + 21*Zeta[3]))/24};
+      24*PolyLog[3, (1 + r2)/2] + 21*Zeta[3]))/24}
