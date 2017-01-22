@@ -24,7 +24,7 @@ ClearAll["NHPL`*", "NHPL`Private`*"];
 
 NHPL::usage    = "NHPL[{w},x,prec] numerical evaluation of harmonic polylogarithm with precision prec";
 
-NHPLbasis::usage = "";
+NHPLbasis::usage = "NHPLbasis[w,x,subs,prec]Calculate all basis elements at weight w";
 
 ParallelTreeSums::usage = "";
 
@@ -152,9 +152,6 @@ ParallelN[list_List,subs_,x0_,p_?NumericQ,opts:OptionsPattern[]]:=
             (* Function to calculate sum series. *)
 
             func=Block[{$MaxExtraPrecision = p},Timing[N[Simplify[#/.subs] /. (x -> x0), p]]]&
-            (* func=TreeSumSeries[#[[1]],#[[2]],{ep,0},p,ProgressIndicator->False, *)
-            (*                    Information->If[Length@#>2,#[[3]],None], *)
-            (*                    Sequence@@FilterRules[{opts},Except[Parallelize|Information|ProgressIndicator]]]& *)
         },
         
         (* Two cases. *)
@@ -219,60 +216,47 @@ NHPL[w:{__Integer},x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:=
     Module[{rex,absx,ww=A2M[w],w1=M2A[w],e,lhpl,nhpl,subnhpl,levo,nevo,subnevo,res},
            absx = N[Abs[x0],prec];
            rex  = N[Re[x0],prec];
-           (* Print[" weight ", ww, " or ",w1 ]; *)
 
            e = H[Sequence@@ww,x]/.red[Length[w1]];
            
-           res = If[absx < 1,
+           res = If[absx < 0.9,
                     (****************************************************************************************************)
                     (*                           u->u                                                                   *)
                     (****************************************************************************************************)
-                    (* No transformation *)
-                    (* Print["[u -> u] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[x0]]]; *)
-                    (* Print["e0=",e]; *)
                     Do[ e = e //.reg[i], {i ,Length[w1], 2, -1}];
-                    
-                    (* Print["eReg=",e]; *)
 
                     lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, x],-1]];
-                    (* Print["LLL ",lhpl]; *)
                     If[Length[lhpl] > 0,
                        nhpl=CalcListHPL[lhpl, x0 ,prec];
                        subnhpl=MapThread[((H@@Append[#1,x]) -> #2)&,{lhpl,nhpl}];
-                       Print["Sub:",subnhpl];
                        N[e /.subnhpl /.x -> x0,prec],
-                       (* All functions evaluated are built in Mathematica ( w < 4 ) *)
                        N[e /.x -> x0,prec]],
                     
                     
-                    If[absx > 2,
+                    If[absx > 1.5,
                        (****************************************************************************************************)
                        (*                           u->1/u                                                                 *)
                        (****************************************************************************************************)
                                               
-                       Print["[u -> 1/u]Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[1/x0]]];
                        Do[
                            e = (e /.tr[i][1]) //.reg[i],
                            {i,Length[w1],2,-1}];
-                       lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r2],-1]];
-                       Print["LLL ",lhpl];
-                       nhpl=CalcListHPL[lhpl, (1-x0)/(1+x0) ,prec];
-                       subnhpl=MapThread[((H@@Append[#1,r2]) -> #2)&,{lhpl,nhpl}];
-                       e /.subnhpl /.{r2->(1-x0)/(1+x0), x->x0}
+                       lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r1],-1]];
+                       nhpl=CalcListHPL[lhpl, 1/x0 ,prec];
+                       subnhpl=MapThread[((H@@Append[#1,r1]) -> #2)&,{lhpl,nhpl}];
+                       e /.subnhpl /.{r1->1/x0, x->x0}
                        ,
                        
-                       
+
                        If[rex > 0,
                           (****************************************************************************************************)
                           (*                           u->(1-u)/(1+u)                                                         *)
                           (****************************************************************************************************)
                           
-                          Print["[u -> (1-u)/(1+u)] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[(1-x0)/(1+x0)]]];
                           Do[
                               e = (e /.tr[i][2]) //.reg[i],
                               {i,Length[w1],2,-1}];
                           lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r2],-1]];
-                          Print["LLL ",lhpl];
                           nhpl=CalcListHPL[lhpl, (1-x0)/(1+x0) ,prec];
                           subnhpl=MapThread[((H@@Append[#1,r2]) -> #2)&,{lhpl,nhpl}];
                           e /.subnhpl /.{r2->(1-x0)/(1+x0), x->x0}
@@ -283,22 +267,13 @@ NHPL[w:{__Integer},x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:=
                           (*                           u->(1+u)/(1-u)                                                         *)
                           (****************************************************************************************************)
                           
-                          (* Print["[u -> (1+u)/(1-u)] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[(1+x0)/(1-x0)]]]; *)
-                          (* Print["e0=",e]; *)
                           Do[
                               e = (e /.tr[i][3]) //.reg[i],
                               {i,Length[w1],2,-1}];
-                          (* Print["eReg=",e]; *)
                           lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r3],-1]];
-                          (* levo  = Union[Cases[{e},PolyLog[_,_]|PolyLog[_,_,_]|Log[_]|Zeta[_],-1]]; *)
-                          (* Print["LLL ",levo]; *)
-                          (* nevo  = ParallelN[levo,{r3->(1+x)/(1-x)}, x0, prec]; *)
-                          (* subnevo = MapThread[(#1 -> #2)&,{levo,nevo}]; *)
-                          (* Print["LLL ",TableForm[({#[[1]],#[[2,1]]})&/@subnevo]]; *)
                           nhpl=CalcListHPL[lhpl, (1+x0)/(1-x0) ,prec];
                           subnhpl=MapThread[((H@@Append[#1,r3]) -> #2)&,{lhpl,nhpl}];
                           e /.subnhpl /.{r3->(1+x0)/(1-x0), x->x0}
-                          
                          ]
                       ]
                    ];
@@ -307,37 +282,31 @@ NHPL[w:{__Integer},x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:=
               N[res,prec],
               res /. HPLs6 -> (Pi^6/945 + CalculateMZV[{-5,-1},prec])
              ]
-
           ];
 
 
+Options[NHPLbasis]={ProgressIndicator->True,FunctionExpand->True};
+
 NHPLbasis[w_Integer,x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:=
-    Module[{rex,absx(* ,ww=A2M[w],w1=M2A[w] *),e,lhpl,nhpl,subnhpl,levo,nevo,subnevo,res,lbasis},
+    Module[{rex,absx,e,lhpl,nhpl,subnhpl,levo,nevo,subnevo,res,lbasis},
            absx = N[Abs[x0],prec];
            rex  = N[Re[x0],prec];
-           (* Print[" weight ",w ]; *)
+
            lbasis=Get["NHPL/Basis/b"<>ToString[w]<>"w.m"]/.H[www___,xx_]:>H[Sequence@@A2M[{www}],xx];
            e = lbasis;
-           (* Print[e]; *)
+
            res = If[absx < 1,
                     (****************************************************************************************************)
                     (*                           u->u                                                                   *)
                     (****************************************************************************************************)
-                    (* No transformation *)
-                    (* Print["[u -> u] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[x0]]]; *)
-                    (* Print["e0=",e]; *)
                     Do[ e = e //.reg[i], {i ,w, 2, -1}];
                     
-                    (* Print["eReg=",e]; *)
-
                     lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, x],-1]];
-                    (* Print["LLL ",lhpl]; *)
+
                     If[Length[lhpl] > 0,
                        nhpl=CalcListHPL[lhpl, x0 ,prec];
                        subnhpl=MapThread[((H@@Append[#1,x]) -> #2)&,{lhpl,nhpl}];
-                       Print["Sub:",subnhpl];
                        N[e /.subnhpl /.x -> x0,prec],
-                       (* All functions evaluated are built in Mathematica ( w < 4 ) *)
                        N[e /.x -> x0,prec]],
                     
                     
@@ -346,15 +315,13 @@ NHPLbasis[w_Integer,x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:
                        (*                           u->1/u                                                                 *)
                        (****************************************************************************************************)
                                               
-                       Print["[u -> 1/u]Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[1/x0]]];
                        Do[
                            e = (e /.tr[i][1]) //.reg[i],
                            {i,w,2,-1}];
-                       lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r2],-1]];
-                       Print["LLL ",lhpl];
-                       nhpl=CalcListHPL[lhpl, (1-x0)/(1+x0) ,prec];
-                       subnhpl=MapThread[((H@@Append[#1,r2]) -> #2)&,{lhpl,nhpl}];
-                       e /.subnhpl /.{r2->(1-x0)/(1+x0), x->x0}
+                       lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r1],-1]];
+                       nhpl=CalcListHPL[lhpl, 1/x0 ,prec];
+                       subnhpl=MapThread[((H@@Append[#1,r1]) -> #2)&,{lhpl,nhpl}];
+                       e /.subnhpl /.{r1->1/x0, x->x0}
                        ,
                        
                        
@@ -363,12 +330,10 @@ NHPLbasis[w_Integer,x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:
                           (*                           u->(1-u)/(1+u)                                                         *)
                           (****************************************************************************************************)
                           
-                          Print["[u -> (1-u)/(1+u)] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[(1-x0)/(1+x0)]]];
                           Do[
                               e = (e /.tr[i][2]) //.reg[i],
                               {i,w,2,-1}];
                           lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r2],-1]];
-                          Print["LLL ",lhpl];
                           nhpl=CalcListHPL[lhpl, (1-x0)/(1+x0) ,prec];
                           subnhpl=MapThread[((H@@Append[#1,r2]) -> #2)&,{lhpl,nhpl}];
                           e /.subnhpl /.{r2->(1-x0)/(1+x0), x->x0}
@@ -379,23 +344,14 @@ NHPLbasis[w_Integer,x0_?NumericQ,prec_:$MachinePrecision,opts:OptionsPattern[]]:
                           (*                           u->(1+u)/(1-u)                                                         *)
                           (****************************************************************************************************)
                           
-                          (* Print["[u -> (1+u)/(1-u)] Calculating with |x|=", absx," Re[x]=", rex, " u=",N[Abs[(1+x0)/(1-x0)]]]; *)
                           e = e/.(H[wwx___,_]->H[wwx,x]);
-                          (* Print["e0=",e]; *)
                           Do[
                               e = (e /.tr[i][3]) //.reg[i],
                               {i,w,2,-1}];
-                          (* Print["eReg=",e]; *)
                           lhpl  = Most[List @@ #]& /@ Union[Cases[{e},H[___, r3],-1]];
-                          (* levo  = Union[Cases[{e},PolyLog[_,_]|PolyLog[_,_,_]|Log[_]|Zeta[_],-1]]; *)
-                          (* Print["LLL ",levo]; *)
-                          (* nevo  = ParallelN[levo,{r3->(1+x)/(1-x)}, x0, prec]; *)
-                          (* subnevo = MapThread[(#1 -> #2)&,{levo,nevo}]; *)
-                          (* Print["LLL ",TableForm[({#[[1]],#[[2,1]]})&/@subnevo]]; *)
                           nhpl=CalcListHPL[lhpl, (1+x0)/(1-x0) ,prec];
                           subnhpl=MapThread[((H@@Append[#1,r3]) -> #2)&,{lhpl,nhpl}];
                           e /.subnhpl /.{r3->(1+x0)/(1-x0), x->x0}
-                          
                          ]
                       ]
                    ];
